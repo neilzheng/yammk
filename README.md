@@ -4,13 +4,15 @@ Yet Another Mongoose Middleware for Koa
 
 ## Models
 
-Models is defined in mongoose syntax, simple model is a object describing the schema, an advanced one can be defined by custom function.
+Models are defined in mongoose syntax, simple model is a object describing the schema, an advanced one can be defined by custom function.
 
 # Simple Object
 
 Post model.
 
 ```js
+/* Post.js */
+/* Model file names are case sensitive! */
 module.exports = {
   content: String,
   author_id: String,
@@ -60,6 +62,9 @@ module.exports = () => {
   return schema;
 };
 ```
+
+**Note: Model file names ARE CASE SENSITIVE!!!**
+
 ## Using Middleware in Koa
 
 ```js
