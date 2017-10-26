@@ -2,11 +2,11 @@
 
 Yet Another Mongoose Middleware for Koa
 
-## Models
+# Models
 
 Models are defined in mongoose syntax, simple model is a object describing the schema, an advanced one can be defined by custom function.
 
-# Simple Object
+## Simple Object
 
 Post model.
 
@@ -18,7 +18,7 @@ module.exports = {
   author_id: String,
 };
 ```
-# Advanced model
+## Advanced model
 
 User model with bcrypt password support and reference to Post model as virtual properties.
 
@@ -65,7 +65,7 @@ module.exports = () => {
 
 **Note: Model file names ARE CASE SENSITIVE!!!**
 
-## Using Middleware in Koa
+# Using Middleware in Koa
 
 ```js
 const Koa = require('koa');
@@ -111,12 +111,12 @@ app.use(async (ctx, next) => {
 //listen & run ...
 ```
 
-## Suggested usage for microservices:
+# Suggested usage for microservices:
 
 * Make microservices.
 * Use single connection in one service.
 * If restful URL is needed, have a look at [YARMK](https://github.com/neilzheng/yarmk).
 
-## License
+# License
 
   MIT
