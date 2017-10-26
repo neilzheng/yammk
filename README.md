@@ -74,7 +74,7 @@ const app = new Koa();
 
 //options for mongoose, can be omitted
 const options = {
-  useMongoClient: true,
+  useMongoClient: true,   //default is true
   poolSize: 10,
 },
 
