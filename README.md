@@ -1,6 +1,6 @@
-# yammk
+# Yet Another Mongoose Middleware for Koa
 
-Yet Another Mongoose Middleware for Koa
+A mongoose middleware for koa.
 
 # Models
 
