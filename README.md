@@ -2,7 +2,7 @@
 
 Yet Another Mongoose Middleware for Koa
 
-##Models
+## Models
 
 Models is defined in mongoose syntax, simple model is a object describing the schema, an advanced one can be defined by custom function.
 
