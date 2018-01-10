@@ -14,7 +14,7 @@ const idGenerator = () =>
 
 module.exports.idGenerator = idGenerator;
 
-module.exports.mongoose = (configs) => {
+module.exports.Mongoose = (configs) => {
   if (typeof configs !== 'object') throw TypeError('configs must be array or object');
 
   const configArray = Array.isArray(configs) ? configs : [configs];
@@ -60,10 +60,16 @@ module.exports.mongoose = (configs) => {
     });
   });
 
-  return async (ctx, next) => {
-    ctx.model = name => modelList[name];
-    ctx.document = (name, obj) => new modelList[name](obj);
+  return {
+    Model: name => modelList[name],
 
-    await next();
+    Document: (name, obj) => new modelList[name](obj),
+
+    Middleware: async (ctx, next) => {
+      ctx.model = name => modelList[name];
+      ctx.document = (name, obj) => new modelList[name](obj);
+
+      await next();
+    }
   };
 };

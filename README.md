@@ -69,7 +69,7 @@ module.exports = () => {
 
 ```js
 const Koa = require('koa');
-const MO = require('./index').mongoose;
+const Mongoose = require('./index');
 const app = new Koa();
 
 //options for mongoose, can be omitted
@@ -95,7 +95,7 @@ const config = [{
   options,
 }];
 
-app.use(MO(config));
+app.use(Mongoose(config).Middleware);
 
 app.use(async (ctx, next) => {
   //single connection
