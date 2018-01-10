@@ -33,7 +33,7 @@ module.exports.Mongoose = (configs) => {
     const files = glob.sync(`${schemas}**/*.js`);
     const mongopts = { useMongoClient: true, ...config.options };
 
-    const conn = mongoose.createConnection(config.uri, mongopts);
+    const db = mongoose.createConnection(config.uri, mongopts);
     files.forEach((file) => {
       const baseName = path.basename(file, '.js');
       const modelName = multiConns ? `${namespace}/${baseName}` : baseName;
@@ -56,7 +56,7 @@ module.exports.Mongoose = (configs) => {
       } else {
         throw TypeError('schema definition must be a function or an object');
       }
-      modelList[modelName] = conn.model(baseName, schema);
+      modelList[modelName] = db.model(baseName, schema);
     });
   });
 
