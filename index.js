@@ -34,6 +34,7 @@ module.exports.Mongoose = (configs) => {
     const mongopts = { useMongoClient: true, ...config.options };
 
     const db = mongoose.createConnection(config.uri, mongopts);
+    db.on('error', console.error.bind(console, 'MongoDB connection error:'));
     files.forEach((file) => {
       const baseName = path.basename(file, '.js');
       const modelName = multiConns ? `${namespace}/${baseName}` : baseName;
