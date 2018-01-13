@@ -111,10 +111,8 @@ app.use(async (ctx, next) => {
 //listen & run ...
 ```
 
-# Suggested usage for microservices:
+# Remarks
 
-* Make microservices.
-* Use single connection in one service.
 * If restful URL is needed, have a look at [YARMK](https://github.com/neilzheng/yarmk).
 
 # License
