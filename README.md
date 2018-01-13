@@ -104,7 +104,7 @@ app.use(async (ctx, next) => {
   const User = ctx.model('local/User');
   const user = new User({ username: 'Alice' });
   //or with ctx.document
-  const user = ctx.document('User');
+  const user = ctx.document('User', { username: 'Alice' });
   this.ctx.body = await user.saveWithPassword('myverysecretpassword');
 })
 
