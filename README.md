@@ -4,21 +4,9 @@ A mongoose middleware for koa.
 
 # Models
 
-Models are defined in mongoose syntax, simple model is a object describing the schema, an advanced one can be defined by custom function.
+Models are defined in mongoose syntax, schema returned by custom function.
 
-## Simple Object
-
-Post model.
-
-```js
-/* Post.js */
-/* Model file names are case sensitive! */
-module.exports = {
-  content: String,
-  author_id: String,
-};
-```
-## Advanced model
+## Model define
 
 User model with bcrypt password support and reference to Post model as virtual properties.
 

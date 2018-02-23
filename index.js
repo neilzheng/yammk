@@ -42,22 +42,11 @@ module.exports.Mongoose = (configs) => {
         throw TypeError(`error, multiple definitions of model ${modelName}`);
       }
 
-      let schema = require(file);
-      if (typeof schema === 'object') {
-        if (!schema.id) {
-          schema.id = {
-            type: String,
-            default: idGenerator,
-            unique: true,
-          };
-        }
-        schema = new mongoose.Schema(schema);
-      } else if (typeof schema === 'function') {
-        schema = schema();
-      } else {
-        throw TypeError('schema definition must be a function or an object');
+      const schema = require(file);
+      if (typeof schema !== 'function') {
+        throw TypeError('schema definition must be a function');
       }
-      modelList[modelName] = db.model(baseName, schema);
+      modelList[modelName] = db.model(baseName, schema());
     });
   });
 
