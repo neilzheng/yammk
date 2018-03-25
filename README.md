@@ -71,17 +71,6 @@ const config = {
   schemas: './models',
   options,  //OK to omit
 }
-//or multiple connections
-const config = [{
-  namespace: 'local',
-  uri: 'mongodb://localhost/db',
-  schemas: './schemas',
-}, {
-  namespace: 'remote',
-  uri: 'mongodb://username:password@remote-mongo-host.com/db',
-  schemas: './schemas2',  //'./schemas' can be reused here
-  options,
-}];
 
 app.use(Mongoose(config).Middleware);
 

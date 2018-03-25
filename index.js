@@ -15,76 +15,60 @@ const idGenerator = () =>
 module.exports.idGenerator = idGenerator;
 
 module.exports.Mongoose = (configs) => {
-  if (typeof configs !== 'object') throw TypeError('configs must be array or object');
+  if (typeof configs !== 'object') throw TypeError('configs must be an object');
 
-  const configArray = Array.isArray(configs) ? configs : [configs];
-  const multiConns = configArray.length > 1;
+  if (!configs.uri) throw TypeError('uri is needed to connect to mongodb server');
+  if (!configs.schemas) throw TypeError('schemas needed for defining models');
+
+  const { uri } = configs;
+  const mongopts = { useMongoClient: true, ...configs.options };
+  let dbConn;
   const modelList = {};
+  const schemaList = {};
 
-  configArray.forEach((config) => {
-    if (multiConns && !config.namespace) {
-      throw TypeError('namespace is required multiple connection mode');
+  const schemasDir = configs.schemas.endsWith('/') ? configs.schemas : `${configs.schemas}/`;
+  const files = glob.sync(`${schemasDir}**/*.js`);
+
+  files.forEach((file) => {
+    const modelName = path.basename(file, '.js');
+    if (Object.hasOwnProperty.call(modelList, modelName)) {
+      throw TypeError(`error, multiple definitions of model ${modelName}`);
     }
-    if (!config.uri) throw TypeError('uri is needed to connect to mongodb server');
-    if (!config.schemas) throw TypeError('schemas needed for defining models');
 
-    const connConfig = {
-      uri: config.uri,
-      mongopts: { useMongoClient: true, ...config.options },
-      conn: undefined,
-      async getConn() {
-        if (!this.conn) {
-          this.conn = await mongoose.createConnection(this.uri, this.mongopts);
-        }
-        return this.conn;
-      }
-    };
+    const schema = require(file);
+    if (typeof schema !== 'function') {
+      throw TypeError('schema definition must be a function');
+    }
 
-    const namespace = multiConns ? config.namespace : '';
-    const schemas = config.schemas.endsWith('/') ? config.schemas : `${config.schemas}/`;
-    const files = glob.sync(`${schemas}**/*.js`);
-
-    files.forEach((file) => {
-      const baseName = path.basename(file, '.js');
-      const modelName = multiConns ? `${namespace}/${baseName}` : baseName;
-      if (Object.hasOwnProperty.call(modelList, modelName)) {
-        throw TypeError(`error, multiple definitions of model ${modelName}`);
-      }
-
-      const schema = require(file);
-      if (typeof schema !== 'function') {
-        throw TypeError('schema definition must be a function');
-      }
-
-      modelList[modelName] = {
-        conn: undefined,
-        model: undefined,
-        async getModel() {
-          if (!this.model) {
-            if (!this.conn) {
-              this.conn = await connConfig.getConn();
-            }
-            this.model = this.conn.model(baseName, schema());
-          }
-
-          return this.model;
-        }
-      };
-    });
+    schemaList[modelName] = schema;
   });
 
+  const getModel = async (name) => {
+    if (!dbConn) {
+      dbConn = await mongoose.createConnection(uri, mongopts);
+
+      Object.entries(schemaList).forEach((item) => {
+        const key = item[0];
+        const val = item[1];
+        modelList[key] = dbConn.model(key, val.call());
+      });
+    }
+
+    return modelList[name];
+  };
+
   return {
-    Model: name => modelList[name].getModel(),
+    Model: getModel,
 
     Document: async (name, obj) => {
-      const Model = await modelList[name].getModel();
+      const Model = await getModel(name);
       return new Model(obj);
     },
 
     Middleware: (ctx, next) => {
-      ctx.model = name => modelList[name].getModel();
+      ctx.model = getModel;
       ctx.document = async (name, obj) => {
-        const Model = await modelList[name].getModel();
+        const Model = await getModel(name);
         return new Model(obj);
       };
 
