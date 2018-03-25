@@ -5,6 +5,7 @@ module.exports = {
         "global-require": 0,
         "new-cap": 0,
         "func-names": 0,
-        "no-console": 0
+        "no-console": 0,
+        "comma-dangle": 0
     }
 };

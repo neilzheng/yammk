@@ -28,13 +28,22 @@ module.exports.Mongoose = (configs) => {
     if (!config.uri) throw TypeError('uri is needed to connect to mongodb server');
     if (!config.schemas) throw TypeError('schemas needed for defining models');
 
+    const connConfig = {
+      uri: config.uri,
+      mongopts: { useMongoClient: true, ...config.options },
+      conn: undefined,
+      async getConn() {
+        if (!this.conn) {
+          this.conn = await mongoose.createConnection(this.uri, this.mongopts);
+        }
+        return this.conn;
+      }
+    };
+
     const namespace = multiConns ? config.namespace : '';
     const schemas = config.schemas.endsWith('/') ? config.schemas : `${config.schemas}/`;
     const files = glob.sync(`${schemas}**/*.js`);
-    const mongopts = { useMongoClient: true, ...config.options };
 
-    const db = mongoose.createConnection(config.uri, mongopts);
-    db.on('error', console.error.bind(console, 'MongoDB connection error:'));
     files.forEach((file) => {
       const baseName = path.basename(file, '.js');
       const modelName = multiConns ? `${namespace}/${baseName}` : baseName;
@@ -46,20 +55,40 @@ module.exports.Mongoose = (configs) => {
       if (typeof schema !== 'function') {
         throw TypeError('schema definition must be a function');
       }
-      modelList[modelName] = db.model(baseName, schema());
+
+      modelList[modelName] = {
+        conn: undefined,
+        model: undefined,
+        async getModel() {
+          if (!this.model) {
+            if (!this.conn) {
+              this.conn = await connConfig.getConn();
+            }
+            this.model = this.conn.model(baseName, schema());
+          }
+
+          return this.model;
+        }
+      };
     });
   });
 
   return {
-    Model: name => modelList[name],
+    Model: name => modelList[name].getModel(),
 
-    Document: (name, obj) => new modelList[name](obj),
+    Document: async (name, obj) => {
+      const Model = await modelList[name].getModel();
+      return new Model(obj);
+    },
 
-    Middleware: async (ctx, next) => {
-      ctx.model = name => modelList[name];
-      ctx.document = (name, obj) => new modelList[name](obj);
+    Middleware: (ctx, next) => {
+      ctx.model = name => modelList[name].getModel();
+      ctx.document = async (name, obj) => {
+        const Model = await modelList[name].getModel();
+        return new Model(obj);
+      };
 
-      await next();
+      return next();
     }
   };
 };
