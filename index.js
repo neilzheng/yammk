@@ -1,20 +1,10 @@
 const glob = require('glob');
 const path = require('path');
-const uuid = require('uuid');
 const mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
 
-const idGenerator = () =>
-  uuid.v4(undefined, Buffer.alloc(16))
-    .toString('base64')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/, '');
-
-module.exports.idGenerator = idGenerator;
-
-module.exports.Mongoose = (configs) => {
+module.exports = (configs) => {
   if (typeof configs !== 'object') throw TypeError('configs must be an object');
 
   if (!configs.uri) throw TypeError('uri is needed to connect to mongodb server');

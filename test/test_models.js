@@ -1,5 +1,5 @@
 const connConfig = require('./configs');
-const { Mongoose } = require('../index');
+const Mongoose = require('../index');
 const { expect } = require('chai');
 const request = require('supertest');
 const Koa = require('koa');
