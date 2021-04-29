@@ -1,8 +1,9 @@
-const connConfig = require('./configs');
-const Mongoose = require('../index');
 const { expect } = require('chai');
 const request = require('supertest');
 const Koa = require('koa');
+
+const connConfig = require('./configs');
+const Mongoose = require('../index');
 
 function connect() {
   return Mongoose(connConfig);
@@ -18,8 +19,8 @@ function User() {
 
 describe('user & group models', () => {
   before(async () => {
-    await (await User()).remove();
-    await (await Group()).remove();
+    await (await User()).deleteMany();
+    await (await Group()).deleteMany();
   });
 
   it('should add group', async () => {
@@ -55,8 +56,8 @@ describe('user & group models', () => {
   });
 
   after(async () => {
-    await (await User()).remove();
-    await (await Group()).remove();
+    await (await User()).deleteMany();
+    await (await Group()).deleteMany();
   });
 });
 
@@ -69,7 +70,7 @@ describe('middleware', () => {
   }
 
   before(async () => {
-    await (await User()).remove();
+    await (await User()).deleteMany();
   });
 
   it('should save testuser in both connections', async () => {
@@ -107,6 +108,6 @@ describe('middleware', () => {
   });
 
   after(async () => {
-    await (await User()).remove();
+    await (await User()).deleteMany();
   });
 });

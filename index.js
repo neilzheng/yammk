@@ -11,7 +11,12 @@ module.exports = (configs) => {
   if (!configs.schemas) throw TypeError('schemas needed for defining models');
 
   const { uri } = configs;
-  const mongopts = { useMongoClient: true, ...configs.options };
+  const mongopts = {
+    useCreateIndex: true,
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+    ...configs.options
+  };
   let dbConn;
   const modelList = {};
   const schemaList = {};
